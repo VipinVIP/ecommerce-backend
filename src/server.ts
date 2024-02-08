@@ -1,22 +1,21 @@
-import express from 'express'
-import { ec_suppliers } from './models/ec_suppliers.js'
-import { sequelize } from './config/sequelize_config.js'
-import { raw } from 'mysql2'
+import express,{Express,Request,Response} from 'express'
+import  EcSuppliers  from './models/ec_suppliers.ts'
+import { sequelize } from './config/sequelize_config.ts'
 
-const app = express()
+const app:Express = express()
 
 sequelize
 	.sync({ force: false })
 	.then(() => {
 		console.log('DB Synced')
 	})
-	.catch((err) => {
+	.catch((err:any) => {
 		console.log('An error occured', err)
 	})
 
 app.use(express.json())
 
-app.post('/supplierRegistration', async (req, res) => {
+app.post('/supplierRegistration', async (req:Request, res:Response) => {
 	try {
 		const {
 			full_name,
@@ -29,7 +28,7 @@ app.post('/supplierRegistration', async (req, res) => {
 			res.status(422).send('Not all required properties sent to me')
 		}
 
-		const newSupplier = await ec_suppliers.create(
+		const newSupplier = await EcSuppliers.create(
 			{
 				full_name: full_name,
 				e_mail: e_mail,
@@ -39,17 +38,16 @@ app.post('/supplierRegistration', async (req, res) => {
 			{ raw: true }
 		)
 		// console.log(newSupplier)
-		res
-			.status(200)
+		res			.status(200)
 			.json(
 				`Hi ${full_name},Your Reg.ID is ${newSupplier.dataValues.registration_id}`
 			)
-	} catch (error) {
+	} catch (error:any) {
 		res.status(500).send(`Error happened. Error is ${error.toString()}`)
 	}
 })
 
-app.post('/login', async (req, res) => {
+app.post('/login', async (req:Request, res:Response) => {
 	const { e_mail, password, user_type } = req.body
 
 	if (!e_mail || !password) {
@@ -57,7 +55,7 @@ app.post('/login', async (req, res) => {
 	}
 
 	if (user_type === 'supplier') {
-		const foundValue = await ec_suppliers.findOne({
+		const foundValue = await EcSuppliers.findOne({
 			where: { e_mail: e_mail, password: password },
 			raw: true,
 		})
@@ -71,7 +69,7 @@ app.post('/login', async (req, res) => {
 	return res.status(401).json(`Supplier alla`)
 })
 
-app.get('/profile', async (req, res) => {
+app.get('/profile', async (req:Request, res:Response) => {
 	try {
 		const { user_type, registration_id } = req.query
 
@@ -80,7 +78,7 @@ app.get('/profile', async (req, res) => {
 		}
 
 		if (user_type === 'supplier') {
-			const foundValue = await ec_suppliers.findOne({
+			const foundValue = await EcSuppliers.findOne({
 				where: { registration_id: registration_id },
 				raw: true,
 			})
@@ -93,7 +91,7 @@ app.get('/profile', async (req, res) => {
 	} catch (error) {}
 })
 
-app.patch('/resetPassword', async (req, res) => {
+app.patch('/resetPassword', async (req:Request, res:Response) => {
 	const { e_mail, new_password, user_type } = req.body
 
 	if (!e_mail || !new_password) {
@@ -101,7 +99,7 @@ app.patch('/resetPassword', async (req, res) => {
 	}
 
 	if (user_type === 'supplier') {
-		const foundValue = await ec_suppliers.update(
+		const foundValue = await EcSuppliers.update(
 			{ password: new_password },
 			{ where: { e_mail: e_mail } }
 		)
