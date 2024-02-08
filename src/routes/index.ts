@@ -1,5 +1,6 @@
 import EcSuppliers from '../models/ec_suppliers'
 import { Router, Request, Response } from 'express'
+import jwt from 'jsonwebtoken'
 
 const router = Router()
 
@@ -52,7 +53,14 @@ router.post('/login', async (req: Request, res: Response) => {
 		})
 		console.log(foundValue)
 		if (foundValue != null) {
-			return res.status(200).json(`Welcome ${foundValue.full_name}`)
+			const token = jwt.sign(
+				{ user_reg_id: foundValue.id, user_type },
+				"vipi's secret",
+				{ expiresIn: '24h' }
+			)
+			return res
+				.status(200)
+				.json({ token: token, message: `Welcome ${foundValue.full_name}` })
 		}
 		return res.status(401).json(`No record with these parameters found`)
 	}
