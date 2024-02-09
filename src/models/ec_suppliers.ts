@@ -63,6 +63,13 @@ EcSuppliers.init(
 				)
 				user.password = hashedPassword
 			},
+			beforeUpdate: (user: EcSuppliers) => {
+				const hashedPassword = bcrypt.hashSync(
+					user.password,
+					bcrypt.genSaltSync(10)
+				)
+				user.password = hashedPassword
+			},
 		},
 	}
 )
