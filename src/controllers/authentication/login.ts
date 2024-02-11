@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import EcSuppliers from '../../models/ec_suppliers'
 import jwt from 'jsonwebtoken'
+import EcCustomers from '../../models/ec_customers'
+import EcSuperAdmin from '../../models/ec_superAdmin'
 
 const login = async (
 	req: Request,
@@ -20,18 +22,51 @@ const login = async (
 		})
 		if (foundValue && bcrypt.compareSync(password, foundValue?.password)) {
 			const token = jwt.sign(
-				{ user_reg_id: foundValue.id, user_type },
-				"vipi's secret",
+				{ registration_id: foundValue.registration_id, user_type },
+				'supplier_secret_key',
 				{ expiresIn: '24h' }
 			)
-			return res
-				.status(200)
-				.json({ token: token, message: `Welcome ${foundValue.full_name}` })
+			return res.status(200).json({
+				token: token,
+				message: `Welcome ${foundValue.full_name}. You are a ${user_type}`,
+			})
 		}
-		return res.status(401).json(`No record with these parameters found`)
-	}
-
-	return res.status(401).json(`Supplier alla`)
+		return res.status(401).json(`No Supplier with these parameters found`)
+	} else if (user_type === 'customer') {
+		const foundValue = await EcCustomers.findOne({
+			where: { e_mail: e_mail },
+			raw: true,
+		})
+		if (foundValue && bcrypt.compareSync(password, foundValue?.password)) {
+			const token = jwt.sign(
+				{ registration_id: foundValue.registration_id, user_type },
+				'customer_secret_key',
+				{ expiresIn: '24h' }
+			)
+			return res.status(200).json({
+				token: token,
+				message: `Welcome ${foundValue.full_name}. You are a ${user_type}`,
+			})
+		}
+		return res.status(401).json(`No Customer with these parameters found`)
+	} else if (user_type === 'super admin') {
+		const foundValue = await EcSuperAdmin.findOne({
+			where: { e_mail: e_mail },
+			raw: true,
+		})
+		if (foundValue && bcrypt.compareSync(password, foundValue?.password)) {
+			const token = jwt.sign(
+				{ user_reg_id: foundValue.id, user_type },
+				'superadmin_secret_key',
+				{ expiresIn: '24h' }
+			)
+			return res.status(200).json({
+				token: token,
+				message: `Welcome ${foundValue.full_name}. You are a ${user_type}`,
+			})
+		}
+		return res.status(401).json(`No Super Admin with these parameters found`)
+	} else return res.status(401).json(`Supplier,Customer,SupAdm onnum alla`)
 }
 
 export default login
