@@ -35,6 +35,10 @@ EcSuppliers.init(
 				return Math.floor(100000 + Math.random() * 900000).toString()
 			},
 		},
+		purchased_plan_id: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
 		registration_time_stamp: {
 			type: DataTypes.DATE,
 			allowNull: false,
