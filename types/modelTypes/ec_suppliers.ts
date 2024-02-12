@@ -7,7 +7,7 @@ class EcSuppliers extends Model {
 	public password!: string
 	public profile_pic!: string | null
 	public registration_id?: string
-	purchased_plan_id?: string | null
+	public purchased_plan_id?: string | null
 	public registration_time_stamp?: Date
 	public createdAt?: Date
 	public updatedAt?: Date
