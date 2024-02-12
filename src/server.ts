@@ -1,9 +1,8 @@
-import express, { Express, NextFunction, Request, Response } from 'express'
-import EcSuppliers from './models/ec_suppliers.ts'
+import express, { Express } from 'express'
 import { sequelize } from './config/sequelize_config.ts'
-import indexRoutes from './routes/index.ts'
-import supplierRoutes from './routes/supplierRoutes.ts'
-import verifyTokenMiddleware from './middlewares/verifyjwt.ts'
+import authRouter from './routes/authRoutes.ts'
+import planRouter from './routes/planRoutes.ts'
+import profileRouter from './routes/profileRoutes.ts'
 
 const app: Express = express()
 
@@ -18,8 +17,9 @@ sequelize
 
 app.use(express.json())
 
-app.use('/api/v2', indexRoutes)
-app.use('/api/v1', verifyTokenMiddleware, supplierRoutes)
+app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/plans', planRouter)
+app.use('/api/v1/profile', profileRouter)
 
 app.listen(3000, () => {
 	console.log(`Server started successfully on PORT 3000`)

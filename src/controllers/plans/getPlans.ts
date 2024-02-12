@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import EcSuperAdmin from '../../models/ec_superAdmin'
 import EcSubscriptionPlans from '../../models/ec_subscriptionPlans'
 
 const getSubScriptionPlans = async (req: Request, res: Response) => {
